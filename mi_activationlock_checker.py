@@ -31,7 +31,7 @@ def send_request(strImei):
         if jsReply["result"] == "ok":
             
             if not 'data' in jsReply:
-                print("unexcepted values found!\n")
+                print("unexpected values found!\n")
                 return
             
             data = jsReply["data"]
