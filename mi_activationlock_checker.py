@@ -7,6 +7,7 @@
 import requests
 import os
 import json
+import datetime
 
 def send_request(strImei):
     # Request
@@ -48,10 +49,14 @@ def send_request(strImei):
             if 'phone' in data:
                 phone = data["phone"]
             
-            print("\n\nPhone : " + phone)
-            print("Email : " + email)
-            print("ActivationLockStatus : " + strLockStatus )
-            print("\n")
+            log = open('log.txt', 'a')
+            curTime = datetime.datetime.now().strftime("%B %d, %Y of %I:%M%p")
+            
+            txt =  curTime + " : " + strImei + "\nPhone : " + phone + "\nEmail : " + email + "\nActivationLockStatus : " + strLockStatus + "\n\n"
+            log.write(txt)
+            log.close()
+            
+            print(txt)
             
         elif jsReply["result"] == "error":
             
