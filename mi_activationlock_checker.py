@@ -8,6 +8,7 @@ import requests
 import os
 import json
 import datetime
+import time
 
 def send_request(strImei):
     # Request
@@ -18,14 +19,9 @@ def send_request(strImei):
             url="https://i.mi.com/support/anonymous/status",
             params={
                 "id": strImei,
+                "ts": int(time.time()*1000) # timestamp added
             },
         )
-        
-        #print('Response HTTP Status Code: {status_code}'.format(
-        #    status_code=response.status_code))
-        
-        #print('Response HTTP Response Body: {content}'.format(
-        #    content=response.content))
         
         jsReply = json.loads(response.content)
         
@@ -37,9 +33,13 @@ def send_request(strImei):
             
             data = jsReply["data"]
             
+            # is locked or not
+
             isLocked = data["locked"]
             strLockStatus = ("ON" if isLocked is True else "OFF")
             
+            # get email and phone
+
             phone = "-"
             email = "-"
             
@@ -49,10 +49,16 @@ def send_request(strImei):
             if 'phone' in data:
                 phone = data["phone"]
             
+            # lost mode or not
+            isLostMode = data["lost"]
+            strLostModeStatus = ("LOST" if isLostMode is True else "CLEAN")
+
+            
             log = open('log.txt', 'a')
             curTime = datetime.datetime.now().strftime("%B %d, %Y of %I:%M%p")
             
-            txt =  curTime + " : " + strImei + "\nPhone : " + phone + "\nEmail : " + email + "\nActivationLockStatus : " + strLockStatus + "\n\n"
+            txt = "\n" + curTime + " : " + strImei + "\nPhone : " + phone + "\nEmail : " + email + "\nActivationLockStatus : " + strLockStatus + "\nIMEI STATUS : " + strLostModeStatus + "\n"
+
             log.write(txt)
             log.close()
             
@@ -67,8 +73,6 @@ def send_request(strImei):
     except requests.exceptions.RequestException:
         print('\nConnect fail due to some network error ..')
         
-    #except KeyError:
-        #print("email not found ..\n")
 
 def usage():
     print("\nXiaomi Activation Lock Checker ")
